@@ -1,44 +1,53 @@
 <?php
 
+use Classes\Move;
+use Classes\KeyGenerate;
+use Classes\HmacGenerate;
+use Classes\TableOutput;
+use Classes\Winner;
+
 require "./vendor/autoload.php";
 
-if (Classes\Move::checkMoves($argv)) {
+if (Move::checkMoves($argv)) {
     $error = new LucidFrame\Console\ConsoleTable();
-    Classes\TableOutput::displayError($error);
+    TableOutput::displayError($error);
     exit();
 }
 
-Classes\Move::setMoves($argv);
+Move::setMoves($argv);
 
 while (true) {
-    Classes\KeyGenerate::generateKey();
+    KeyGenerate::generateKey();
 
-    Classes\Move::generatePcMove();
+    Move::generatePcMove();
 
-    Classes\HmacGenerate::generateHmac();
+    HmacGenerate::generateHmac();
 
     $name = new LucidFrame\Console\ConsoleTable();
-    Classes\TableOutput::displayGameName($name);
+    TableOutput::displayGameName($name);
 
-    Classes\Move::showMoves();
+    Move::showMoves();
 
-    Classes\Move::setPlayerMove();
+    Move::setPlayerMove();
 
-    if (Classes\Move::getPlayerMove() == 0) {
+    if (Move::getPlayerMove() == 0) {
         exit();
-    } elseif (Classes\Move::getPlayerMove() == "?") {
+    } elseif (Move::getPlayerMove() == "?") {
         $table = new LucidFrame\Console\ConsoleTable();
-        Classes\TableOutput::displayHelpTable(Classes\Move::$moves, $table);
-    } elseif ((Classes\Move::getPlayerMove() <= Classes\Move::$movesCount)&&(Classes\Move::getPlayerMove()>0)) {
-        Classes\Winner::showResult(
-            Classes\Move::getPlayerMove(),
-            Classes\Move::getPcMove(),
-            Classes\Move::$movesCount
+        TableOutput::displayHelpTable(Move::$moves, $table);
+    } elseif (
+        Move::getPlayerMove() <= Move::$movesCount &&
+        Move::getPlayerMove() > 0
+    ) {
+        Winner::showResult(
+            Move::getPlayerMove(),
+            Move::getPcMove(),
+            Move::$movesCount
         );
-        echo "HMAC Key: " . Classes\KeyGenerate::getKey() . PHP_EOL;
+        echo "HMAC Key: " . KeyGenerate::getKey() . PHP_EOL;
     } else {
         echo "There is no such move!" . PHP_EOL;
     }
 
-    Classes\Move::Continue();
+    Move::Continue();
 }
